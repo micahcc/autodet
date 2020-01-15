@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import torch
@@ -23,6 +24,8 @@ def main():
                         help='input file directory')
     parser.add_argument('-N', '--batch-size', default=1, type=int,
                         help='Batch size')
+    parser.add_argument('-d', '--model-dir', required=True,
+                        help='Model dir (save and restore from here)')
 
     args = parser.parse_args()
     dataset_params = {
@@ -30,6 +33,12 @@ def main():
         'shuffle': True,
         'num_workers': 6,
     }
+
+    if not os.path.exists(args.model_dir):
+        os.makedirs(args.model_dir)
+    if not os.path.isdir(args.model_dir):
+        print("{} exists and isn't a directory!".format(args.model_dir))
+        return -1
 
     if torch.cuda.is_available():
         print("Using CUDA")
@@ -69,12 +78,21 @@ def main():
             loss.backward()
 
             optimizer.step()
-
             print(loss)
 
-            #plt.imshow(sample['image'])
-            #plt.show()
+        import ipdb
+        ipdb.set_trace()
+        # at the end of each epoch save
+        torch.save({
+            'encoder_state_dict': encoder.state_dict(),
+            'decoder_state_dict': decoder.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'losser_state_dict': losser.state_dict(),
+        },
+            os.path.join(args.model_dir, 'checkpoint.tch'))
+
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
