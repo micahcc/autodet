@@ -4,9 +4,9 @@ import torch.nn.functional as F
 from autodet.Residual import Residual
 
 
-class Encoder(nn.Module):
+class Critic(nn.Module):
     def __init__(self, ichannels, ochannels):
-        super(Encoder, self).__init__()
+        super(Critic, self).__init__()
         self.layer0 = nn.Conv2d(ichannels, 20, 1)
         self.layer1 = Residual(ichannels=20, ochannels=20, kradius=1)
         self.layer2 = nn.Conv2d(20, ochannels, 1)

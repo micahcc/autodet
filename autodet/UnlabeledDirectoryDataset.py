@@ -28,11 +28,11 @@ class UnlabeledDirectoryDataset(torch.utils.data.Dataset):
         img_name = os.path.join(self.root_dir, self.files[idx])
         image = Image.open(img_name)
 
+        if self.transform:
+            image = self.transform(image)
+
         # transpose so the data is CHW instead of HWC
         img = np.transpose(image, [2, 0, 1])
         sample = {'image': img}
-
-        if self.transform:
-            sample = self.transform(sample)
 
         return sample
